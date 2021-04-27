@@ -14,6 +14,11 @@ void setup() {
 
   esc.write(180);
   Serial.println("reaching to max speed"); 
+  
+  delay(3000);// delay for motor reaching to max
+  
+  esc.write(0);//esc stopped
+  Serial.println("motor stopped");
 }
 
 void loop() {

@@ -29,7 +29,18 @@ void setup() {
 }
 
 void loop() {
- 
+  if (mode == MODE_DISARM) {
+    arm_esc();
+  } else if (mode == MODE_ARM) {
+    if (digitalRead(PIN_BT1)) {
+      max_speed();
+    }
+  } else if (mode == MODE_MAX_SPEED) {
+    if (digitalRead(PIN_BT2)) {
+      motor_break();
+    } else if (!digitalRead(PIN_BT1)) {
+        slow_down();
+  }
 }
 
 void arm_esc() {

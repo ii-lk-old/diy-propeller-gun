@@ -5,6 +5,7 @@
 
 #define PIN_BT1 5 // MAX SPEED
 #define PIN_BT2 6 // FIRE/BREAK
+#define PIN_BUZZER 7 // BUZZER
 
 #define MODE_DISARM 0
 #define MODE_ARM 1
@@ -25,6 +26,7 @@ void setup() {
   Serial.println("esc attached");
   mode = MODE_DISARM;
 
+  tone(PIN_BUZZER, 3000, 50);
   delay(500);
 }
 
@@ -46,7 +48,7 @@ void loop() {
 void arm_esc() {
   esc.write(0);//motor arm
   Serial.print("esc arm start");
-  delay(3000);
+  _delay(3000, 0);
   Serial.println("-done");
   mode = MODE_ARM;
 }
@@ -55,7 +57,7 @@ void max_speed() {
   mode = MODE_MAX_SPEED;
   esc.write(i);
   delay(4000);//speed up delay
-  tone(PIN_BUZZER, 6000, 500);
+  tone(PIN_BUZZER, 6000, 1000);
   Serial.print("max speed");
   Serial.println("-done");
 }
@@ -78,7 +80,22 @@ void slow_down() {
   esc.write(0);
   Serial.print("motor stopped");
   mode = MODE_ARM;
-  delay(2000);
+   _delay(2000, -1);
   Serial.println("-done");
 }
 
+
+void _delay(int duration, int tone_dir) {
+  long ltime = millis();
+  while (millis() - ltime < duration) {
+    tone(PIN_BUZZER, 3000 + ((millis() - ltime)*tone_dir), 50);
+    delay(100);
+    if (mode == MODE_MAX_SPEED && !digitalRead(PIN_BT1)) {
+      slow_down();
+      return;
+    } else if (mode == MODE_ARM && digitalRead(PIN_BT1)) {
+      max_speed();
+      return;
+    }
+  }
+}
